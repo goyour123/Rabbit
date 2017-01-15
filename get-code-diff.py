@@ -20,7 +20,7 @@ def dir_tree_creator(src, dst):
 config = configparser.ConfigParser()
 config.read('setting.ini')
 
-dst_path = config['os']['target']
+dst_path = config['local']['target']
 dst_mod_path = dst_path + '/Modified'
 dst_org_path = dst_path + '/Original'
 
