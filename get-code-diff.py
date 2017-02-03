@@ -1,6 +1,5 @@
 import git
 import os
-import re
 import configparser
 import shutil
 
@@ -36,15 +35,19 @@ repo_path = config['git']['repo']
 repo = git.Repo(config['git']['repo'])
 repo_git = repo.git
 
-commit = repo.commit(config['git']['sha'])
+commit_sha = config['git']['sha']
+commit = repo.commit(commit_sha)
 pre_commit = commit.parents[0]
 
+print('Comparing diff files')
 diffs = commit.diff(pre_commit)
 
-tree_files = []
+branch = config['git']['branch']
 
+print('Checking out to ' + commit_sha)
 repo_git.checkout(commit)
 
+tree_files = []
 for f in diffs:
     dst_path_target = dir_tree_creator(f.a_blob.path, dst_mod_path)
     tree_files.append(f.a_blob.path)
@@ -52,6 +55,7 @@ for f in diffs:
     if os.path.isfile(src_path):
         shutil.copy(src_path, dst_path_target)
 
+print('Checking out to previous commit')
 repo_git.checkout(pre_commit)
 
 for f in tree_files:
@@ -60,4 +64,4 @@ for f in tree_files:
     if os.path.isfile(src_path):
         shutil.copy(src_path, dst_org_path)
 
-repo_git.checkout('master')
+repo_git.checkout(branch)
