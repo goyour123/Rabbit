@@ -3,6 +3,11 @@ import os
 import configparser
 import shutil
 
+def dir_creator(dir_path):
+    if os.path.isdir(dir_path):
+        shutil.rmtree(dir_path)
+    os.mkdir(dir_path)
+
 def dir_tree_creator(src, dst):
     src_item = src.split('/')
     dst_target = dst
@@ -23,13 +28,8 @@ dst_path = config['local']['target']
 dst_mod_path = dst_path + '/Modified'
 dst_org_path = dst_path + '/Original'
 
-if os.path.isdir(dst_mod_path):
-    shutil.rmtree(dst_mod_path)
-os.mkdir(dst_mod_path)
-
-if os.path.isdir(dst_org_path):
-    shutil.rmtree(dst_org_path)
-os.mkdir(dst_org_path)
+dir_creator(dst_mod_path)
+dir_creator(dst_org_path)
 
 repo_path = config['git']['repo']
 repo = git.Repo(config['git']['repo'])
