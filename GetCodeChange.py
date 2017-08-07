@@ -1,12 +1,12 @@
-import git
 import os
 import configparser
 import shutil
+import git
 
 def dir_creator(dir_path):
     if os.path.isdir(dir_path):
         shutil.rmtree(dir_path)
-    os.mkdir(dir_path)
+    os.makedirs(dir_path)
 
 def dir_tree_creator(src, dst):
     src_item = src.split('/')
