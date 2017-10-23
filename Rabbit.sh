@@ -6,12 +6,20 @@ output='D:\Python\Python3.5\Rabbit\Output'
 #rm -r $output
 
 # Create output directory for checkout solution.
-
+mkdir -p $output
 
 cd $repo
 diff_file=$(git diff --name-only)
 
-for file in $diff_file
+for file_path in $diff_file
   do
-    cp -r $file $output\\$file
+    ifs_org=$IFS
+    IFS='/'
+    for folder in $file_path
+      do
+        echo $folder
+      done
+    IFS=$ifs_org
+
+    #cp -r $file_path $output\\$file_path
   done
