@@ -8,6 +8,9 @@ output='D:\Python\Python3.5\Rabbit\Output'
 # Create output directory for checkout solution.
 mkdir -p $output
 
+mod='Modified'
+org='Original'
+
 cd $repo
 diff_file=$(git diff --name-only)
 
@@ -19,8 +22,8 @@ for file_path in $diff_file
     else
       file_dir=${file_path%/*}
     fi
-    mkdir -p $output/$file_dir
-    cp -R $file_path $output/$file_path
+    mkdir -p $output/$mod/$file_dir
+    cp -R $file_path $output/$mod/$file_path
   done
 
 # Pause for the result
