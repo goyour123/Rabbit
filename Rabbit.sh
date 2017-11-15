@@ -12,19 +12,36 @@ mod='Modified'
 org='Original'
 
 cd $repo
-diff_file=$(git diff --name-only)
+#diff_file=$(git diff --name-only)
+status_file=$(git status -s)
 
-for file_path in $diff_file
+ifs_org=$IFS
+IFS=$'\n'
+for status_file_path in $status_file
   do
+    status=${status_file_path% *}
+    
+    # Check if this file is a new file then skip copy to Modified folder
+    if [ $status == $'??' ]; then
+      continue
+    fi
+
+    file_path=${status_file_path##* }
+
+    # Extract the file name from file path
     file_name=${file_path##*/}
+
+    # Extract the directory of file from file path
     if [ ${file_path%/*} == $file_name ]; then
       file_dir=""
     else
       file_dir=${file_path%/*}
     fi
+
     mkdir -p $output/$mod/$file_dir
     cp -R $file_path $output/$mod/$file_path
   done
+IFS=ifs_org
 
 # Pause for the result
 #read -rsn 1 key
