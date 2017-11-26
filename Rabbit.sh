@@ -19,10 +19,9 @@ ifs_org=$IFS
 IFS=$'\n'
 for status_file_path in $status_file
   do
+    # Check if this file is a deleted file then skip copy to Modified folder
     status=${status_file_path% *}
-    
-    # Check if this file is a new file then skip copy to Modified folder
-    if [ $status == $'??' ]; then
+    if [ $status == $' D' ]; then
       continue
     fi
 
@@ -39,6 +38,8 @@ for status_file_path in $status_file
     fi
 
     mkdir -p $output/$mod/$file_dir
+    mkdir -p $output/$org/$file_dir
+
     cp -R $file_path $output/$mod/$file_path
   done
 IFS=ifs_org
