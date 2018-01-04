@@ -1,6 +1,6 @@
 
-repo='D:\Python\Python2.7\bios-toolbox'
-output='D:\Python\Python3.5\Rabbit\Output'
+repo='D:\Project\Chester'
+output='D:\Project\Rabbit\Output'
 
 # Remove output directory to ensure that files in it are correct.
 #rm -r $output
@@ -40,7 +40,16 @@ for status_file_path in $status_file
     mkdir -p $output/$mod/$file_dir
     mkdir -p $output/$org/$file_dir
 
+    # Copy modified file to output folder
     cp -R $file_path $output/$mod/$file_path
+
+    # Copy original file to output folder by revert the modified file to HEAD
+    git checkout HEAD $repo/$file_path
+    cp -R $file_path $output/$org/$file_path
+
+    # Copy modified file back to repo
+    cp -R $output/$mod/$file_path $file_path
+
   done
 IFS=ifs_org
 
