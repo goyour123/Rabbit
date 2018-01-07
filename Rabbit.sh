@@ -19,12 +19,7 @@ ifs_org=$IFS
 IFS=$'\n'
 for status_file_path in $status_file
   do
-    # Check if this file is a deleted file then skip copy to Modified folder
     status=${status_file_path% *}
-    if [ $status == $' D' ]; then
-      continue
-    fi
-
     file_path=${status_file_path##* }
 
     # Extract the file name from file path
@@ -37,18 +32,27 @@ for status_file_path in $status_file
       file_dir=${file_path%/*}
     fi
 
-    mkdir -p $output/$mod/$file_dir
     mkdir -p $output/$org/$file_dir
-
-    # Copy modified file to output folder
-    cp -R $file_path $output/$mod/$file_path
+    if [ $status == $' M' ]; then
+      mkdir -p $output/$mod/$file_dir
+    
+      # Copy modified file to output folder
+      cp -R $file_path $output/$mod/$file_path
+    fi
 
     # Copy original file to output folder by revert the modified file to HEAD
     git checkout HEAD $repo/$file_path
     cp -R $file_path $output/$org/$file_path
 
     # Copy modified file back to repo
-    cp -R $output/$mod/$file_path $file_path
+    if [ $status == $' M' ]; then
+      cp -R $output/$mod/$file_path $file_path
+    fi
+
+    # Remove deleted file
+    if [ $status == $' D' ]; then
+      rm $repo/$file_path
+    fi
 
   done
 IFS=ifs_org
