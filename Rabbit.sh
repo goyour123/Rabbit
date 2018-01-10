@@ -33,16 +33,23 @@ for status_file_path in $status_file
     fi
 
     mkdir -p $output/$org/$file_dir
-    if [ $status == $' M' ]; then
+    if [ $status != $' D' ]; then
       mkdir -p $output/$mod/$file_dir
-    
-      # Copy modified file to output folder
+
+      if [ $status == $' M' ]; then
+        echo "Modified" $file_path
+      else
+        echo "Added" $file_path
+      fi
+      # Copy modified/added file to output folder
       cp -R $file_path $output/$mod/$file_path
     fi
 
-    # Copy original file to output folder by revert the modified file to HEAD
-    git checkout HEAD $repo/$file_path
-    cp -R $file_path $output/$org/$file_path
+    if [ $status != $'??' ] && [ $status != $'A ' ]; then
+      # Copy original file to output folder by revert the modified file to HEAD
+      git checkout HEAD $repo/$file_path
+      cp -R $file_path $output/$org/$file_path
+    fi
 
     # Copy modified file back to repo
     if [ $status == $' M' ]; then
@@ -51,6 +58,7 @@ for status_file_path in $status_file
 
     # Remove deleted file
     if [ $status == $' D' ]; then
+      echo "Deleted" $file_path
       rm $repo/$file_path
     fi
 
@@ -58,4 +66,4 @@ for status_file_path in $status_file
 IFS=ifs_org
 
 # Pause for the result
-#read -rsn 1 key
+read -rsp $'\nPress any key to continue...\n' -n 1
