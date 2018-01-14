@@ -11,6 +11,9 @@ mkdir -p $output
 mod='Modified'
 org='Original'
 
+mkdir $output/$mod
+mkdir $output/$org
+
 cd $repo
 #diff_file=$(git diff --name-only)
 status_file=$(git status -s)
@@ -42,18 +45,18 @@ for status_file_path in $status_file
         echo "Added" $file_path
       fi
       # Copy modified/added file to output folder
-      cp -R $file_path $output/$mod/$file_path
+      cp -r $file_path $output/$mod/$file_dir
     fi
 
     if [ $status != $'??' ] && [ $status != $'A ' ]; then
       # Copy original file to output folder by revert the modified file to HEAD
       git checkout HEAD $repo/$file_path
-      cp -R $file_path $output/$org/$file_path
+      cp -r $file_path $output/$org/$file_dir
     fi
 
     # Copy modified file back to repo
     if [ $status == $' M' ]; then
-      cp -R $output/$mod/$file_path $file_path
+      cp -r $output/$mod/$file_path $file_path
     fi
 
     # Remove deleted file
