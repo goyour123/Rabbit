@@ -35,6 +35,7 @@ for status_file_path in $status_file
       file_dir=${file_path%/*}
     fi
 
+    dir_to_del=""
     mkdir -p $output/$org/$file_dir
     if [ $status != $' D' ]; then
       mkdir -p $output/$mod/$file_dir
@@ -46,6 +47,18 @@ for status_file_path in $status_file
       fi
       # Copy modified/added file to output folder
       cp -r $file_path $output/$mod/$file_dir
+    else
+      # Decide the directory which should be delete/remain in repository
+      dir_to_remain=$file_dir
+      until [ -d $dir_to_remain ]
+      do
+        dir_to_del=$dir_to_remain
+        if [ $dir_to_remain != ${dir_to_remain%/*} ]; then
+          dir_to_remain=${dir_to_remain%/*}
+        else
+          break
+        fi
+      done
     fi
 
     if [ $status != $'??' ] && [ $status != $'A ' ]; then
@@ -61,8 +74,13 @@ for status_file_path in $status_file
 
     # Remove deleted file
     if [ $status == $' D' ]; then
-      echo "Deleted" $file_path
-      rm $repo/$file_path
+      if [ -n "$dir_to_del" ]; then
+        echo "Deleted" $dir_to_del
+        rm -r $dir_to_del
+      else
+        echo "Deleted" $file_path
+        rm $repo/$file_path
+      fi
     fi
 
   done
