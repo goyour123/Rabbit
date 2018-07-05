@@ -59,9 +59,9 @@ print('Checking out to previous commit')
 repo_git.checkout(pre_commit)
 
 for f in tree_files:
-    dst_path_target = dir_tree_creator(f, dst_mod_path)
+    dst_path_target = dir_tree_creator(f, dst_org_path)
     src_path = repo_path + '/' + f
     if os.path.isfile(src_path):
-        shutil.copy(src_path, dst_org_path)
+        shutil.copy(src_path, dst_path_target)
 
 repo_git.checkout(branch)
