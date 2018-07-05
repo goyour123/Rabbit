@@ -42,6 +42,7 @@ pre_commit = commit.parents[0]
 print('Comparing diff files')
 diffs = commit.diff(pre_commit)
 
+org_branch = repo.active_branch.name
 branch = config['git']['branch']
 
 print('Checking out to ' + commit_sha)
@@ -53,6 +54,7 @@ for f in diffs:
     tree_files.append(f.a_blob.path)
     src_path = repo_path + '/' + f.a_blob.path
     if os.path.isfile(src_path):
+        print('Copying ' + src_path + ' to ' + dst_path_target)
         shutil.copy(src_path, dst_path_target)
 
 print('Checking out to previous commit')
@@ -62,6 +64,7 @@ for f in tree_files:
     dst_path_target = dir_tree_creator(f, dst_org_path)
     src_path = repo_path + '/' + f
     if os.path.isfile(src_path):
+        print('Copying ' + src_path + ' to ' + dst_path_target)
         shutil.copy(src_path, dst_path_target)
 
-repo_git.checkout(branch)
+repo_git.checkout(org_branch)
