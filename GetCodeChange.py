@@ -21,23 +21,23 @@ def dir_tree_creator(src, dst):
                 dst_target = dst
     return dst_target
 
-def main():
-
+def config_init():
     with open('config.json') as cfgJson:
         config = json.load(cfgJson)
 
-    dst_path = config['dest_path']
-    dst_mod_path = dst_path + '/Modified'
-    dst_org_path = dst_path + '/Original'
+    return config['dest_path'], config['source_path'], config['sha'], config['branch']
 
-    dir_creator(dst_mod_path)
-    dir_creator(dst_org_path)
+def main():
 
-    repo_path = config['source_path']
+    dst_path, repo_path, commit_sha, branch = config_init()
+
+    dst_mod_path, dst_org_path = dst_path + '/Modified', dst_path + '/Original'
+    for dirt in [dst_mod_path, dst_org_path]:
+        dir_creator(dirt)
+
     repo = git.Repo(repo_path)
     repo_git = repo.git
 
-    commit_sha = config['sha']
     commit = repo.commit(commit_sha)
     pre_commit = commit.parents[0]
 
@@ -45,7 +45,6 @@ def main():
     diffs = commit.diff(pre_commit)
 
     org_branch = repo.active_branch.name
-    branch = config['branch']
 
     print('Checking out to ' + commit_sha)
     repo_git.checkout(commit)
