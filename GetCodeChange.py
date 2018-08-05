@@ -21,50 +21,55 @@ def dir_tree_creator(src, dst):
                 dst_target = dst
     return dst_target
 
-with open('config.json') as cfgJson:
-    config = json.load(cfgJson)
+def main():
 
-dst_path = config['dest_path']
-dst_mod_path = dst_path + '/Modified'
-dst_org_path = dst_path + '/Original'
+    with open('config.json') as cfgJson:
+        config = json.load(cfgJson)
 
-dir_creator(dst_mod_path)
-dir_creator(dst_org_path)
+    dst_path = config['dest_path']
+    dst_mod_path = dst_path + '/Modified'
+    dst_org_path = dst_path + '/Original'
 
-repo_path = config['source_path']
-repo = git.Repo(repo_path)
-repo_git = repo.git
+    dir_creator(dst_mod_path)
+    dir_creator(dst_org_path)
 
-commit_sha = config['sha']
-commit = repo.commit(commit_sha)
-pre_commit = commit.parents[0]
+    repo_path = config['source_path']
+    repo = git.Repo(repo_path)
+    repo_git = repo.git
 
-print('Comparing diff files')
-diffs = commit.diff(pre_commit)
+    commit_sha = config['sha']
+    commit = repo.commit(commit_sha)
+    pre_commit = commit.parents[0]
 
-org_branch = repo.active_branch.name
-branch = config['branch']
+    print('Comparing diff files')
+    diffs = commit.diff(pre_commit)
 
-print('Checking out to ' + commit_sha)
-repo_git.checkout(commit)
+    org_branch = repo.active_branch.name
+    branch = config['branch']
 
-tree_files = []
-for f in diffs:
-    dst_path_target = dir_tree_creator(f.a_blob.path, dst_mod_path)
-    tree_files.append(f.a_blob.path)
-    src_path = repo_path + '/' + f.a_blob.path
-    if os.path.isfile(src_path):
-        print('Copying ' + src_path + ' to ' + dst_path_target)
-        shutil.copy(src_path, dst_path_target)
+    print('Checking out to ' + commit_sha)
+    repo_git.checkout(commit)
 
-print('Checking out to previous commit')
-repo_git.checkout(pre_commit)
+    tree_files = []
+    for f in diffs:
+        dst_path_target = dir_tree_creator(f.a_blob.path, dst_mod_path)
+        tree_files.append(f.a_blob.path)
+        src_path = repo_path + '/' + f.a_blob.path
+        if os.path.isfile(src_path):
+            print('Copying ' + src_path + ' to ' + dst_path_target)
+            shutil.copy(src_path, dst_path_target)
 
-for f in tree_files:
-    dst_path_target = dir_tree_creator(f, dst_org_path)
-    src_path = repo_path + '/' + f
-    if os.path.isfile(src_path):
-        print('Copying ' + src_path + ' to ' + dst_path_target)
-        shutil.copy(src_path, dst_path_target)
+    print('Checking out to previous commit')
+    repo_git.checkout(pre_commit)
 
-repo_git.checkout(org_branch)
+    for f in tree_files:
+        dst_path_target = dir_tree_creator(f, dst_org_path)
+        src_path = repo_path + '/' + f
+        if os.path.isfile(src_path):
+            print('Copying ' + src_path + ' to ' + dst_path_target)
+            shutil.copy(src_path, dst_path_target)
+
+    repo_git.checkout(org_branch)
+
+if __name__ == '__main__':
+    main()
