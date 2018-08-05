@@ -1,5 +1,5 @@
 import os
-import configparser
+import json
 import shutil
 import git
 
@@ -21,21 +21,21 @@ def dir_tree_creator(src, dst):
                 dst_target = dst
     return dst_target
 
-config = configparser.ConfigParser()
-config.read('setting.ini')
+with open('config.json') as cfgJson:
+    config = json.load(cfgJson)
 
-dst_path = config['local']['target']
+dst_path = config['dest_path']
 dst_mod_path = dst_path + '/Modified'
 dst_org_path = dst_path + '/Original'
 
 dir_creator(dst_mod_path)
 dir_creator(dst_org_path)
 
-repo_path = config['git']['repo']
-repo = git.Repo(config['git']['repo'])
+repo_path = config['source_path']
+repo = git.Repo(repo_path)
 repo_git = repo.git
 
-commit_sha = config['git']['sha']
+commit_sha = config['sha']
 commit = repo.commit(commit_sha)
 pre_commit = commit.parents[0]
 
@@ -43,7 +43,7 @@ print('Comparing diff files')
 diffs = commit.diff(pre_commit)
 
 org_branch = repo.active_branch.name
-branch = config['git']['branch']
+branch = config['branch']
 
 print('Checking out to ' + commit_sha)
 repo_git.checkout(commit)
