@@ -1,7 +1,15 @@
 from GetCodeChange import config_init, dir_creator, dir_tree_creator
 import tkinter, tkinter.filedialog
-import os, shutil
+import os, shutil, json
 import git
+
+def json_restore(json_path, dic):
+    with open(json_path, 'r+') as f:
+        j = json.load(f)
+        j.update(dic)
+        f.truncate(0)
+        f.seek(0)
+        f.write(json.dumps(j, indent=4))
 
 class Main:
     def __init__(self, rt):
@@ -96,6 +104,9 @@ class Main:
 
         self.status_text.set("Checking back to original branch...")
         repo.git.checkout(repo.head)
+
+        self.status_text.set("Restoring config.json...")
+        json_restore('config.json', {"source_path": self.repo_path, "dest_path": self.dst_path, "sha": self.commit_sha})
 
         self.status_text.set("Completed")
 
