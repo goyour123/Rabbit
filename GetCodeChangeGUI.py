@@ -34,10 +34,10 @@ class Main:
         self.sha_entry.place(x=30, y=170, width=300, height=25)
         self.sha_entry.insert(0, self.commit_sha)
 
-        tkinter.Label(self.rt, text='Branch', anchor='w').place(x=340, y=140, width=100, height=25)
-        branch_entry = tkinter.Entry(self.rt)
-        branch_entry.place(x=340, y=170, width=190, height=25)
-        branch_entry.insert(0, branch)
+        # tkinter.Label(self.rt, text='Branch', anchor='w').place(x=340, y=140, width=100, height=25)
+        # branch_entry = tkinter.Entry(self.rt)
+        # branch_entry.place(x=340, y=170, width=190, height=25)
+        # branch_entry.insert(0, branch)
 
         tkinter.Button(self.rt, text='Rabbit', command=self.rabbit).place(x=540, y=170, width=80, height=25)
 
