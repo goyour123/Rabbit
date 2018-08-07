@@ -50,16 +50,22 @@ class Main:
         rt.geometry("650x250+300+200")
 
     def source_browser(self):
-        cur_path = os.getcwd()
-        folder_path = tkinter.filedialog.askdirectory(title='Browse source path', initialdir=cur_path)
+        if os.path.isdir(self.repo_path):
+            initDir = self.repo_path
+        else:
+            initDir = os.getcwd()
+        folder_path = tkinter.filedialog.askdirectory(title='Browse source path', initialdir=initDir)
         if folder_path:
             self.source_entry.delete(0, 'end')
             self.source_entry.insert(0, folder_path)
             self.repo_path = folder_path
 
     def dst_browser(self):
-        cur_path = os.getcwd()
-        folder_path = tkinter.filedialog.askdirectory(title='Browse destination path', initialdir=cur_path)
+        if os.path.isdir(self.dst_path):
+            initDir = self.dst_path
+        else:
+            initDir = os.getcwd()
+        folder_path = tkinter.filedialog.askdirectory(title='Browse destination path', initialdir=initDir)
         if folder_path:
             self.dst_entry.delete(0, 'end')
             self.dst_entry.insert(0, folder_path)
