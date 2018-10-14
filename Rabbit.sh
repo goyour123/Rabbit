@@ -1,6 +1,13 @@
 
-repo='D:\Project\Chester'
-output='D:\Project\Rabbit\Output'
+# Use the first argument as the repo path.
+repo=$1
+
+# Use the second argument as the output folder path.
+if [ $2 ]; then
+  output=$2/Output
+else
+  output=$(PWD)/Output
+fi
 
 # Remove output directory to ensure that files in it are correct.
 #rm -r $output
