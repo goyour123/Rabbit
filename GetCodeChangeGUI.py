@@ -11,11 +11,15 @@ def json_restore(json_path, dic):
         f.seek(0)
         f.write(json.dumps(j, indent=4))
 
-class Main:
+class Rabbit:
     def __init__(self, rt):
         self.rt = rt
         self.gui_interface_init()
         self.dst_path, self.repo_path, self.commit_sha, branch = config_init()
+
+        # self.opt_var = tkinter.StringVar()
+        # self.opt_rb1 = tkinter.Radiobutton(root, var=self.opt_var, text='rb1', value=1)
+        # self.opt_rb2 = tkinter.Radiobutton(root, var=self.opt_var, text='rb2', value=2)
 
         tkinter.Label(self.rt, text='Source Path', anchor='w').place(x=30, y=20, width=100, height=25)
         self.source_entry = tkinter.Entry(self.rt)
@@ -73,7 +77,14 @@ class Main:
 
     def rabbit(self):
 
+        self.repo_path = self.source_entry.get()
         repo = git.Repo(self.repo_path)
+
+        if repo.is_dirty():
+            self.status_text.set(repo.working_dir + ' is dirty. Uncommited changes exist.')
+            self.rt.update()
+            return
+
         self.commit_sha = self.sha_entry.get()
         commit = repo.commit(self.commit_sha)
         pre_commit = commit.parents[0]
@@ -124,6 +135,7 @@ class Main:
 
         self.status_text.set("Completed")
 
-root = tkinter.Tk()
-app = Main(root)
-root.mainloop()
+if __name__ == "__main__":
+    root = tkinter.Tk()
+    app = Rabbit(root)
+    root.mainloop()
