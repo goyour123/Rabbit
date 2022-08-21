@@ -11,6 +11,10 @@ def json_restore(json_path, dic):
         f.seek(0)
         f.write(json.dumps(j, indent=4))
 
+# class GitRabbit(git.Repo):
+#     def __init__(self, repo_path):
+#         super().__init__(repo_path)
+
 class Rabbit:
     def __init__(self, rt):
         self.rt = rt
@@ -38,10 +42,10 @@ class Rabbit:
         self.sha_entry.place(x=30, y=170, width=300, height=25)
         self.sha_entry.insert(0, self.commit_sha)
 
-        # tkinter.Label(self.rt, text='Branch', anchor='w').place(x=340, y=140, width=100, height=25)
-        # branch_entry = tkinter.Entry(self.rt)
-        # branch_entry.place(x=340, y=170, width=190, height=25)
-        # branch_entry.insert(0, branch)
+        tkinter.Label(self.rt, text='Branch', anchor='w').place(x=340, y=140, width=100, height=25)
+        self.branch_entry = tkinter.Entry(self.rt)
+        self.branch_entry.place(x=340, y=170, width=190, height=25)
+        self.branch_entry.insert(0, branch)
 
         tkinter.Button(self.rt, text='Rabbit', command=self.rabbit).place(x=540, y=170, width=80, height=25)
 
@@ -75,31 +79,38 @@ class Rabbit:
             self.dst_entry.insert(0, folder_path)
             self.dst_path = folder_path
 
+    def update_status_text(self, text):
+        self.status_text.set (text)
+        self.rt.update()
+
     def rabbit(self):
 
         self.repo_path = self.source_entry.get()
         repo = git.Repo(self.repo_path)
 
         if repo.is_dirty():
-            self.status_text.set(repo.working_dir + ' is dirty. Uncommited changes exist.')
-            self.rt.update()
+            self.update_status_text(repo.working_dir + ' is dirty. Uncommited changes exist.')
             return
+
+        # Check whether the branch name in entry exists or not
+        branch_name = self.branch_entry.get()
+        org_branch_name = repo.active_branch.name
+        if branch_name != org_branch_name:
+            self.update_status_text('Checking out branch ' + branch_name + ' ...')
+            repo.git.checkout(branch_name)
 
         self.commit_sha = self.sha_entry.get()
         commit = repo.commit(self.commit_sha)
         pre_commit = commit.parents[0]
 
-        self.status_text.set("Comparing diff files...")
-        self.rt.update()
+        self.update_status_text("Comparing diff files...")
         diffs = commit.diff(pre_commit)
 
-        self.status_text.set("Checking out to " + self.commit_sha + "...")
-        self.rt.update()
+        self.update_status_text("Checking out to " + self.commit_sha + "...")
         repo.git.checkout(commit)
 
         dst_mod_path, dst_org_path = self.dst_path + '/Modified', self.dst_path + '/Original'
-        self.status_text.set("Creating folders...")
-        self.rt.update()
+        self.update_status_text("Creating folders...")
         for dirt in [dst_mod_path, dst_org_path]:
             dir_creator(dirt)
 
@@ -109,31 +120,26 @@ class Rabbit:
             tree_files.append(f.a_blob.path)
             src_path = self.repo_path + '/' + f.a_blob.path
             if os.path.isfile(src_path):
-                self.status_text.set('Copying ' + src_path + ' to ' + dst_path_target)
-                self.rt.update()
+                self.update_status_text('Copying ' + src_path + ' to ' + dst_path_target)
                 shutil.copy(src_path, dst_path_target)
 
-        self.status_text.set('Checking out to previous commit')
-        self.rt.update()
+        self.update_status_text('Checking out to previous commit')
         repo.git.checkout(pre_commit)
 
         for f in tree_files:
             dst_path_target = dir_tree_creator(f, dst_org_path)
             src_path = self.repo_path + '/' + f
             if os.path.isfile(src_path):
-                self.status_text.set('Copying ' + src_path + ' to ' + dst_path_target)
-                self.rt.update()
+                self.update_status_text('Copying ' + src_path + ' to ' + dst_path_target)
                 shutil.copy(src_path, dst_path_target)
 
-        self.status_text.set("Checking back to original branch...")
-        self.rt.update()
-        repo.git.checkout(repo.head)
+        self.update_status_text("Checking back to original branch...")
+        repo.git.checkout(org_branch_name)
 
-        self.status_text.set("Restoring config.json...")
-        self.rt.update()
+        self.update_status_text("Restoring config.json...")
         json_restore('config.json', {"source_path": self.repo_path, "dest_path": self.dst_path, "sha": self.commit_sha})
 
-        self.status_text.set("Completed")
+        self.update_status_text("Completed")
 
 if __name__ == "__main__":
     root = tkinter.Tk()
