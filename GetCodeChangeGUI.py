@@ -22,8 +22,8 @@ class Rabbit:
         self.dst_path, self.repo_path, self.commit_sha, branch = config_init()
 
         self.opt_var = tkinter.StringVar()
-        self.opt_rb1 = tkinter.Radiobutton(root, var=self.opt_var, text='HEAD', command=self.select_rb1, value=1)
-        self.opt_rb2 = tkinter.Radiobutton(root, var=self.opt_var, text='SHA', command=self.select_rb2, value=2)
+        self.opt_rb1 = tkinter.Radiobutton(root, var=self.opt_var, text='HEAD', command=self.select_rb1, value='HEAD')
+        self.opt_rb2 = tkinter.Radiobutton(root, var=self.opt_var, text='SHA', command=self.select_rb2, value='SHA')
         self.opt_rb1.place(x=30, y=10)
         self.opt_rb2.place(x=100, y=10)
         self.opt_rb1.select()
@@ -41,7 +41,7 @@ class Rabbit:
         tkinter.Button(self.rt, text='Browse', command=self.dst_browser).place(x=540, y=125, width=80, height=25)
 
         tkinter.Label(self.rt, text='SHA', anchor='w').place(x=30, y=155, width=100, height=25)
-        init_state = 'normal' if self.opt_var.get() == '2' else 'disable'
+        init_state = 'normal' if self.opt_var.get() == 'SHA' else 'disable'
         self.sha_entry = tkinter.Entry(self.rt)
         self.sha_entry.place(x=30, y=185, width=300, height=25)
         self.sha_entry.insert(0, self.commit_sha)
@@ -97,7 +97,11 @@ class Rabbit:
     def rabbit(self):
 
         self.repo_path = self.source_entry.get()
-        repo = git.Repo(self.repo_path)
+        try:
+            repo = git.Repo(self.repo_path)
+        except:
+            self.update_status_text('Invalid Git repository.')
+            return
 
         if repo.is_dirty():
             self.update_status_text(repo.working_dir + ' is dirty. Uncommited changes exist.')
@@ -114,7 +118,7 @@ class Rabbit:
                 self.update_status_text('Unable to check out ' + branch_name)
                 return
 
-        self.commit_sha = self.sha_entry.get()
+        self.commit_sha = self.sha_entry.get() if self.opt_var == 'SHA' else repo.head.commit.hexsha
         commit = repo.commit(self.commit_sha)
         pre_commit = commit.parents[0]
 
@@ -152,7 +156,7 @@ class Rabbit:
         repo.git.checkout(org_branch_name)
 
         self.update_status_text("Restoring config.json...")
-        json_restore('config.json', {"source_path": self.repo_path, "dest_path": self.dst_path, "sha": self.commit_sha})
+        json_restore('config.json', {"source_path": self.repo_path, "dest_path": self.dst_path, "sha": self.commit_sha, "branch": branch_name})
 
         self.update_status_text("Completed")
 
