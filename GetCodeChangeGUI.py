@@ -22,11 +22,11 @@ class Rabbit:
         self.dst_path, self.repo_path, self.commit_sha, branch = config_init()
 
         self.opt_var = tkinter.StringVar()
-        self.opt_rb1 = tkinter.Radiobutton(root, var=self.opt_var, text='HEAD', command=self.select_rb1, value=1, state='disable')
+        self.opt_rb1 = tkinter.Radiobutton(root, var=self.opt_var, text='HEAD', command=self.select_rb1, value=1)
         self.opt_rb2 = tkinter.Radiobutton(root, var=self.opt_var, text='SHA', command=self.select_rb2, value=2)
         self.opt_rb1.place(x=30, y=10)
         self.opt_rb2.place(x=100, y=10)
-        self.opt_rb2.select()
+        self.opt_rb1.select()
 
         tkinter.Label(self.rt, text='Source Path', anchor='w').place(x=30, y=35, width=100, height=25)
         self.source_entry = tkinter.Entry(self.rt)
@@ -42,7 +42,6 @@ class Rabbit:
 
         tkinter.Label(self.rt, text='SHA', anchor='w').place(x=30, y=155, width=100, height=25)
         init_state = 'normal' if self.opt_var.get() == '2' else 'disable'
-        print (init_state)
         self.sha_entry = tkinter.Entry(self.rt)
         self.sha_entry.place(x=30, y=185, width=300, height=25)
         self.sha_entry.insert(0, self.commit_sha)
@@ -109,7 +108,11 @@ class Rabbit:
         org_branch_name = repo.active_branch.name
         if branch_name != org_branch_name:
             self.update_status_text('Checking out branch ' + branch_name + ' ...')
-            repo.git.checkout(branch_name)
+            try:
+                repo.git.checkout(branch_name)
+            except:
+                self.update_status_text('Unable to check out ' + branch_name)
+                return
 
         self.commit_sha = self.sha_entry.get()
         commit = repo.commit(self.commit_sha)
