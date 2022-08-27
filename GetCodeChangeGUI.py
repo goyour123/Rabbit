@@ -21,33 +21,39 @@ class Rabbit:
         self.gui_interface_init()
         self.dst_path, self.repo_path, self.commit_sha, branch = config_init()
 
-        # self.opt_var = tkinter.StringVar()
-        # self.opt_rb1 = tkinter.Radiobutton(root, var=self.opt_var, text='rb1', value=1)
-        # self.opt_rb2 = tkinter.Radiobutton(root, var=self.opt_var, text='rb2', value=2)
+        self.opt_var = tkinter.StringVar()
+        self.opt_rb1 = tkinter.Radiobutton(root, var=self.opt_var, text='HEAD', command=self.select_rb1, value=1, state='disable')
+        self.opt_rb2 = tkinter.Radiobutton(root, var=self.opt_var, text='SHA', command=self.select_rb2, value=2)
+        self.opt_rb1.place(x=30, y=10)
+        self.opt_rb2.place(x=100, y=10)
+        self.opt_rb2.select()
 
-        tkinter.Label(self.rt, text='Source Path', anchor='w').place(x=30, y=20, width=100, height=25)
+        tkinter.Label(self.rt, text='Source Path', anchor='w').place(x=30, y=35, width=100, height=25)
         self.source_entry = tkinter.Entry(self.rt)
-        self.source_entry.place(x=30, y=50, width=500, height=25)
+        self.source_entry.place(x=30, y=65, width=500, height=25)
         self.source_entry.insert(0, self.repo_path)
-        tkinter.Button(self.rt, text='Browse', command=self.source_browser).place(x=540, y=50, width=80, height=25)
+        tkinter.Button(self.rt, text='Browse', command=self.source_browser).place(x=540, y=65, width=80, height=25)
 
-        tkinter.Label(self.rt, text='Destination Path', anchor='w').place(x=30, y=80, width=100, height=25)
+        tkinter.Label(self.rt, text='Destination Path', anchor='w').place(x=30, y=95, width=100, height=25)
         self.dst_entry = tkinter.Entry(self.rt)
-        self.dst_entry.place(x=30, y=110, width=500, height=25)
+        self.dst_entry.place(x=30, y=125, width=500, height=25)
         self.dst_entry.insert(0, self.dst_path)
-        tkinter.Button(self.rt, text='Browse', command=self.dst_browser).place(x=540, y=110, width=80, height=25)
+        tkinter.Button(self.rt, text='Browse', command=self.dst_browser).place(x=540, y=125, width=80, height=25)
 
-        tkinter.Label(self.rt, text='SHA', anchor='w').place(x=30, y=140, width=100, height=25)
+        tkinter.Label(self.rt, text='SHA', anchor='w').place(x=30, y=155, width=100, height=25)
+        init_state = 'normal' if self.opt_var.get() == '2' else 'disable'
+        print (init_state)
         self.sha_entry = tkinter.Entry(self.rt)
-        self.sha_entry.place(x=30, y=170, width=300, height=25)
+        self.sha_entry.place(x=30, y=185, width=300, height=25)
         self.sha_entry.insert(0, self.commit_sha)
+        self.sha_entry.configure(state=init_state)
 
-        tkinter.Label(self.rt, text='Branch', anchor='w').place(x=340, y=140, width=100, height=25)
+        tkinter.Label(self.rt, text='Branch', anchor='w').place(x=340, y=155, width=100, height=25)
         self.branch_entry = tkinter.Entry(self.rt)
-        self.branch_entry.place(x=340, y=170, width=190, height=25)
+        self.branch_entry.place(x=340, y=185, width=190, height=25)
         self.branch_entry.insert(0, branch)
 
-        tkinter.Button(self.rt, text='Rabbit', command=self.rabbit).place(x=540, y=170, width=80, height=25)
+        tkinter.Button(self.rt, text='Rabbit', command=self.rabbit).place(x=540, y=185, width=80, height=25)
 
         self.status_text = tkinter.StringVar()
         self.status_bar = tkinter.Label(self.rt, textvariable=self.status_text, anchor='w', bd=1, relief='sunken')
@@ -55,7 +61,7 @@ class Rabbit:
 
     def gui_interface_init(self):
         self.rt.title('Rabbit')
-        self.rt.geometry("650x250+300+200")
+        self.rt.geometry("650x260+300+200")
 
     def source_browser(self):
         if os.path.isdir(self.repo_path):
@@ -78,6 +84,12 @@ class Rabbit:
             self.dst_entry.delete(0, 'end')
             self.dst_entry.insert(0, folder_path)
             self.dst_path = folder_path
+
+    def select_rb1(self):
+        self.sha_entry.configure(state='disable')
+
+    def select_rb2(self):
+        self.sha_entry.configure(state='normal')
 
     def update_status_text(self, text):
         self.status_text.set (text)
