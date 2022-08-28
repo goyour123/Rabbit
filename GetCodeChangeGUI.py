@@ -118,7 +118,7 @@ class Rabbit:
                 self.update_status_text('Unable to check out ' + branch_name)
                 return
 
-        self.commit_sha = self.sha_entry.get() if self.opt_var == 'SHA' else repo.head.commit.hexsha
+        self.commit_sha = self.sha_entry.get() if self.opt_var.get() == 'SHA' else repo.head.commit.hexsha
         commit = repo.commit(self.commit_sha)
         pre_commit = commit.parents[0]
 
