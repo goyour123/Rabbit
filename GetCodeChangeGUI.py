@@ -43,13 +43,13 @@ class Rabbit:
         tkinter.Label(self.rt, text='SHA', anchor='w').place(x=30, y=155, width=100, height=25)
         init_state = 'normal' if self.opt_var.get() == 'SHA' else 'disable'
         self.sha_entry = tkinter.Entry(self.rt)
-        self.sha_entry.place(x=30, y=185, width=300, height=25)
+        self.sha_entry.place(x=30, y=185, width=285, height=25)
         self.sha_entry.insert(0, self.commit_sha)
         self.sha_entry.configure(state=init_state)
 
-        tkinter.Label(self.rt, text='Branch', anchor='w').place(x=340, y=155, width=100, height=25)
+        tkinter.Label(self.rt, text='Branch', anchor='w').place(x=325, y=155, width=100, height=25)
         self.branch_entry = tkinter.Entry(self.rt)
-        self.branch_entry.place(x=340, y=185, width=190, height=25)
+        self.branch_entry.place(x=325, y=185, width=205, height=25)
         self.branch_entry.insert(0, branch)
 
         tkinter.Button(self.rt, text='Rabbit', command=self.rabbit).place(x=540, y=185, width=80, height=25)
