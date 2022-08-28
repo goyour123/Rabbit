@@ -4,5 +4,8 @@ __pycache__/
 # Editor specific
 .vscode/*
 
+# User-specific files
+/*.build
+/*.dist
 test_target_folder/
 test_repo/
