@@ -135,12 +135,14 @@ class Rabbit:
 
         tree_files = []
         for f in diffs:
-            dst_path_target = dir_tree_creator(f.a_blob.path, dst_mod_path)
-            tree_files.append(f.a_blob.path)
-            src_path = self.repo_path + '/' + f.a_blob.path
-            if os.path.isfile(src_path):
-                self.update_status_text('Copying ' + src_path + ' to ' + dst_path_target)
-                shutil.copy(src_path, dst_path_target)
+            if f.a_blob:
+                dst_path_target = dir_tree_creator(f.a_blob.path, dst_mod_path)
+                src_path = os.path.join(self.repo_path, f.a_blob.path)
+                if os.path.isfile(src_path):
+                    self.update_status_text('Copying ' + src_path + ' to ' + dst_path_target)
+                    shutil.copy(src_path, dst_path_target)
+            if f.b_blob:
+                tree_files.append(f.b_blob.path)
 
         self.update_status_text('Checking out to previous commit')
         repo.git.checkout(pre_commit)
