@@ -109,7 +109,7 @@ class Rabbit:
 
         # Check whether the branch name in entry exists or not
         branch_name = self.branch_entry.get()
-        org_branch_name = repo.active_branch.name
+        org_branch_name = repo.active_branch.name if not repo.head.is_detached else None
         if branch_name != org_branch_name:
             self.update_status_text('Checking out branch ' + branch_name + ' ...')
             try:
@@ -153,7 +153,8 @@ class Rabbit:
                 shutil.copy(src_path, dst_path_target)
 
         self.update_status_text("Checking back to original branch...")
-        repo.git.checkout(org_branch_name)
+        if org_branch_name:
+            repo.git.checkout(org_branch_name)
 
         self.update_status_text("Restoring config.json...")
         json_restore('config.json', {"source_path": self.repo_path, "dest_path": self.dst_path, "sha": self.commit_sha, "branch": branch_name})
