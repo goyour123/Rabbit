@@ -2,5 +2,5 @@
     "source_path": "test_repo",
     "dest_path":   "test_target_folder",
     "sha":         "9abc45c798dbf5a1b1e2d1c3d7b62e648c597c3f",
-    "branch":      "master"
+    "branch":      "main"
 }
