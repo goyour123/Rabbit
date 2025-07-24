@@ -107,6 +107,11 @@ class Rabbit:
             self.update_status_text(repo.working_dir + ' is dirty. Uncommited changes exist.')
             return
 
+        self.dst_path = self.dst_entry.get()
+        if not os.path.isdir(self.dst_path):
+            self.update_status_text('Invalid destination path.')
+            return
+
         # Check whether the branch name in entry exists or not
         branch_name = self.branch_entry.get()
         org_branch_name = repo.active_branch.name if not repo.head.is_detached else None
